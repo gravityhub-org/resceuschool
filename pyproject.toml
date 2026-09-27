@@ -1,0 +1,24 @@
+[project]
+name = "2026-resceu-gw-lensing-school"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Otto Akseli Hannuksela", email = "otto.akseli.hannuksela@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "beartype>=0.22.9",
+    "jaxtyping>=0.3.11",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "scienceplots>=2.2.2",
+    "scipy>=1.18.1",
+]
+
+[project.scripts]
+2026-resceu-gw-lensing-school = "2026_resceu_gw_lensing_school:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
