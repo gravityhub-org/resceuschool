@@ -51,6 +51,11 @@
   - Evidence $Z$: overall probability of the data under the model.
 ]
 
+// Title slide: Demo
+#title-slide([Demo], subtitle: [Tutorial 1: Bayesian inference of a binary black hole merger])
+
+
+
 // Nested sampling GIF (full-slide). Typst freezes GIF frames;
 // `make lecture1.pdf` splices an Okular-playable animate page over this.
 #figure-slide(
@@ -58,9 +63,6 @@
   image("figures/external/nested_sampling.gif", width: 100%, height: 100%, fit: "contain"),
   credit: [Credit: David Yallup],
 )
-
-// Title slide: Demo
-#title-slide([Demo], subtitle: [Tutorial 1: Bayesian inference of a binary black hole merger])
 
 // Double figure column slide: Waveform (top) and posterior of M_c, d_L, t_c, and phi_c (bottom)
 #two-figure-slide(
@@ -70,6 +72,15 @@
   credit: []
 )
 
+// Double figure column slide: Waveform (top) and posterior of M_c, d_L, t_c, and phi_c (bottom)
+#two-figure-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/injection_waveform.pdf", width: 100%, height: 100%, fit: "contain"),
+  image("figures/injection_posterior.pdf", width: 100%, height: 100%, fit: "contain"),
+  credit: []
+)
+// Title slide: Demo
+#title-slide([Demo], subtitle: [Tutorial 2: Laplace approximation of a binary black hole merger])
 
 // Laplace GIF (full-slide). Same Okular splice as the previous page.
 #figure-slide(
@@ -77,8 +88,6 @@
   image("figures/laplace_approximation.gif", width: 100%, height: 100%, fit: "contain"),
 )
 
-// Title slide: Demo
-#title-slide([Demo], subtitle: [Tutorial 2: Laplace approximation of a binary black hole merger])
 
 // Double figure slide: Earlier posterior and Laplace approximation
 #two-figure-slide(
@@ -87,6 +96,15 @@
   image("figures/injection_posterior_laplace_approximation.pdf", width: 100%, height: 100%, fit: "contain"),
   credit: []
 )
+
+// Double figure slide: Earlier posterior and Laplace approximation
+#two-figure-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/injection_posterior.pdf", width: 100%, height: 100%, fit: "contain"),
+  image("figures/injection_posterior_laplace_approximation.pdf", width: 100%, height: 100%, fit: "contain"),
+  credit: []
+)
+
 
 // Lens set up: Geometry 
 #figure-slide(
