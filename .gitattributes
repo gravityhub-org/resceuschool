@@ -6,3 +6,4 @@ tutorials/output/**/*.json filter=lfs diff=lfs merge=lfs -text
 tutorials/output/**/*.npy filter=lfs diff=lfs merge=lfs -text
 tutorials/output/**/*.feather filter=lfs diff=lfs merge=lfs -text
 tutorials/output/**/*.pickle filter=lfs diff=lfs merge=lfs -text
+tutorials/interpolator_json/**/*.json filter=lfs diff=lfs merge=lfs -text

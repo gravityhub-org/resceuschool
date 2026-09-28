@@ -146,7 +146,8 @@ nonlensed-on-lensed: $(NONLENSED_LENSED_PRODUCTS)
 
 summarise: $(SUMMARISE_PRODUCTS)
 
-ler: $(LER_PRODUCTS)
+# Rates JSON from 05, then forecast PDFs from 06 (06 already depends on LER_PRODUCTS).
+ler: $(LER_PRODUCTS) $(FORECAST_PRODUCTS)
 
 forecasts: $(FORECAST_PRODUCTS)
 
@@ -268,7 +269,7 @@ force-nonlensed-on-lensed: clean-nonlensed-on-lensed
 force-summarise: clean-summarise
 	$(MAKE) summarise
 
-force-ler: clean-ler
+force-ler: clean-ler clean-forecasts
 	$(MAKE) ler
 
 force-forecasts: clean-forecasts
@@ -276,7 +277,7 @@ force-forecasts: clean-forecasts
 
 force-all: clean-all
 	$(MAKE) all
-	$(MAKE) forecasts
+	$(MAKE) ler
 
 help:
 	@echo "Targets:"
@@ -287,8 +288,8 @@ help:
 	@echo "  make millilens-lensed     Millilensing PE on a lensed two-image injection"
 	@echo "  make nonlensed-on-lensed  Tutorial-01 PE (unlensed model) on lensed data"
 	@echo "  make summarise            Evidences, Bayes factors, overlays + lens recovery"
-	@echo "  make ler                  LeR unlensed/lensed statistics + rates (05)"
-	@echo "  make forecasts            LeR forecast PDFs (06; builds ler if needed)"
+	@echo "  make ler                  LeR rates (05) + forecast PDFs (06)"
+	@echo "  make forecasts            LeR forecast PDFs only (06; builds rates if needed)"
 	@echo "  make clean                Remove bilby (01) output"
 	@echo "  make clean-gwfast         Remove gwfast output"
 	@echo "  make clean-millilens      Remove millilensing-on-unlensed output"
@@ -298,7 +299,7 @@ help:
 	@echo "  make clean-ler            Remove ler_data/"
 	@echo "  make clean-forecasts      Remove forecasts/"
 	@echo "  make clean-all            Remove all tutorial outputs (incl. ler/forecasts)"
-	@echo "  make force / force-*      Clean and rebuild a target (force-all = PE + forecasts)"
+	@echo "  make force / force-*      Clean and rebuild a target (force-all = PE + ler plots)"
 	@echo ""
 	@echo "Environment (exported to recipes):"
 	@echo "  MPLBACKEND=$(MPLBACKEND)   matplotlib backend (default Agg for headless)"
