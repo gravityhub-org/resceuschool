@@ -1,0 +1,10 @@
+gw150914_strain.pdf / gw150914_strain.png
+  Source: Estimated gravitational-wave strain amplitude from GW150914
+    (Phys. Rev. Lett. 116, 061102 (2016), Fig. 2; Abbott et al.,
+    LIGO Scientific Collaboration and Virgo Collaboration)
+  URL: https://commons.wikimedia.org/wiki/File:Estimated_gravitational-wave_strain_amplitude_from_GW150914.png
+  Direct: https://upload.wikimedia.org/wikipedia/commons/4/48/Estimated_gravitational-wave_strain_amplitude_from_GW150914.png
+  DOI: https://doi.org/10.1103/PhysRevLett.116.061102
+  License: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0)
+  Downloaded: 2026-09-28
+  Local note: PNG from Wikimedia Commons; PDF is a local convert for Typst.
