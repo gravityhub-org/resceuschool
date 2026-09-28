@@ -1,0 +1,20 @@
+[project]
+name = "gw-lensing-tutorials"
+version = "0.1.0"
+description = "RESCEU GW lensing school tutorials"
+readme = "README.md"
+# gwfast pins jaxlib<=0.4.30, which has no cp313 wheels.
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "bilby",
+    "cogwheel-pe>=1.6.0",
+    "corner>=2.3.0",
+    "gwfast>=1.1.2",
+    "lalsuite",
+    "matplotlib",
+    "numpy",
+    "pandas",
+]
+
+[tool.uv]
+package = false
