@@ -42,16 +42,13 @@
 #title-slide([Demo], subtitle: [Tutorial 1: Bayesian inference of a binary black hole merger])
 
 // Double figure column slide: Waveform (top) and posterior of M_c, d_L, t_c, and phi_c (bottom)
-#two-figure-columns-slide(
+#two-figure-slide(
   [How to get from a detector to merging black hole?],
   image("figures/injection_waveform.pdf", width: 100%, height: 100%, fit: "contain"),
   image("figures/injection_posterior.pdf", width: 100%, height: 100%, fit: "contain"),
   credit: []
-)[
-  - Top: Gravitational-wave strain from a binary black hole merger.
-  - Bottom: Posterior distributions of the chirp mass $M_c$, luminosity distance $d_L$, coalescence time $t_c$, and coalescence phase $phi_c$.
-  - The posterior distributions are obtained using Bayesian inference on the observed data.
-]
+)
+
 
 // Laplace GIF (full-slide). Same Okular splice as the previous page.
 #figure-slide(
@@ -61,6 +58,14 @@
 
 // Title slide: Demo
 #title-slide([Demo], subtitle: [Tutorial 2: Laplace approximation of a binary black hole merger])
+
+// Double figure slide: Earlier posterior and Laplace approximation
+#two-figure-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/injection_posterior.pdf", width: 100%, height: 100%, fit: "contain"),
+  image("figures/injection_posterior_laplace_approximation.pdf", width: 100%, height: 100%, fit: "contain"),
+  credit: []
+)
 
 // Lens set up: Geometry 
 #figure-slide(
