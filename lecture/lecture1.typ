@@ -31,6 +31,18 @@
   - Evidence $Z$: overall probability of the data under the model.
 ]
 
+// Double column figure with nested sampling figures/external/nested_sampling.gif (credits: David Yallup) and Laplace's approximation figures/laplace_approximation.pdf (credits: course-made).
+#two-figure-columns-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/external/nested_sampling.gif", width: 100%, height: 100%, fit: "contain"),
+  image("figures/laplace_approximation.pdf", width: 100%, height: 100%, fit: "contain"),
+  credit-a: [Credit: David Yallup],
+  credit-b: [],
+)[
+  - Nested sampling: a numerical method for computing the evidence $Z$ and exploring the posterior $p(phi|d)$.
+  - Laplace's approximation: an analytical method for approximating the posterior $p(phi|d)$ as a Gaussian distribution around the maximum a posteriori (MAP) estimate.
+]
+
 // Lens set up: Geometry 
 #figure-slide(
   [What is geometrical time delay?],
@@ -54,14 +66,14 @@
   - Dimensionless variables: 
    - $vec(x) = vec(theta) / theta_L$
    - $vec(y) = vec( beta ) / theta_L$
-   - $psi_L (vec(x)) = psi(vec(x)) / theta_L^2$
+   - $psi_(L) (vec(x)) = psi(vec(x)) / theta_L^2$
   - What is the time delay?
   $
     Delta t(vec(x), vec(y)) = t_L [ 1/2  |vec(x) - vec(y)|^2 - psi_(L)(vec(x)) ].
   $ <eq:time_delay>
   - Where are the images?
   $
-    vec(y) = vec(x) - nabla psi_L (vec(x)).
+    vec(y) = vec(x) - nabla psi_(L) (vec(x)).
   $ <eq:lens_equation>
   - How magnified are the images?
   $
@@ -74,13 +86,14 @@
   [Where are the images for a singular isothermal sphere?],
   image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
   (
-    [(a) $vec(y) = vec(x) - vec(x) / |vec(x)|$],
-    [(b) $vec(y) = vec(x) + theta_E vec(x) / |vec(x)|$],
-    [(c) $vec(y) = vec(x) - theta_E |vec(x)|$],
-    [(d) $vec(y) = vec(x) + theta_E |vec(x)|$],
+    [$vec(y) = vec(x) - vec(x) / |vec(x)|$],
+    [$vec(y) = vec(x) + theta_E vec(x) / |vec(x)|$],
+    [$vec(y) = vec(x) - theta_E |vec(x)|$],
+    [$vec(y) = vec(x) + theta_E |vec(x)|$],
+  ),
   credit: [],
 )[
-  - The lens equation is $vec(y) = vec(x) - nabla psi_L (vec(x))$.
+  - The lens equation is $vec(y) = vec(x) - nabla psi_(L) (vec(x))$.
   - For a singular isothermal sphere, $psi(vec(theta)) = theta_E |vec(theta)|$.
 ]
 
@@ -91,16 +104,20 @@
   [(a) $vec(y) = vec(x) - vec(x) / |vec(x)|$],
   credit: [],
 )[
-  - For a singular isothermal sphere, $psi_L(vec(x)) = |vec(x)|$.
-  - The gradient is $nabla psi_L(vec(x)) = vec(x) / |vec(x)|$.
+  - For a singular isothermal sphere, $psi_(L)(vec(x)) = |vec(x)|$.
+  - The gradient is $nabla psi_(L)(vec(x)) = vec(x) / |vec(x)|$.
   - Therefore, the lens equation becomes $vec(y) = vec(x) - vec(x) / |vec(x)|$.
-  - The solutions are:
+  - Setting x-axis aligned with image, the solutions are:
   $
-    vec(x) = vec(y) plus.minus 1.
+    x = y plus.minus 1.
   $
   - The magnification
   $
-    |mu(vec(x))|^(-1) = |(partial vec(y)) / ( partial vec(x) ) | = |1-1/|x||.
+    |mu(vec(x))|^(-1) = |(partial vec(y)) / ( partial vec(x) ) | = |1-|x|^(-1)|.
+  $
+  - The time delay
+  $
+    Delta t(x, y) = t_L [ 1/2  |x - y|^2 - psi_(L)(x) ] 
   $
 ]
 
