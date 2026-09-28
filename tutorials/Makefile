@@ -14,6 +14,10 @@
 # sampling runs resume from the sampler checkpoint (same cached injection).
 # Editing the script does not rebuild by itself — use `make force*`.
 UV ?= uv
+# Headless plotting (bilby / matplotlib); override with e.g. MPLBACKEND=TkAgg if needed.
+export MPLBACKEND ?= Agg
+# Dynesty worker processes per bilby run (override with NPOOL=...).
+export NPOOL ?= 8
 
 # --- bilby ---
 BILBY_SCRIPT := 01_parameter_estimation.py
