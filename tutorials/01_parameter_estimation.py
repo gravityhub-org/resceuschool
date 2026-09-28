@@ -21,6 +21,8 @@ import numpy as np
 from bilby.core.prior import DeltaFunction
 from bilby.gw.conversion import convert_to_lal_binary_black_hole_parameters
 
+from plot_style import CORNER_KWARGS, apply_corner_style
+
 OUTPUT_DIR = Path(__file__).resolve().parent / "output" / "01_parameter_estimation"
 RUN_DIR = OUTPUT_DIR / "bilby_run"
 LABEL = "lhvk_distance_demo"
@@ -266,20 +268,12 @@ def plot_parameter_posteriors(
         for name in SAMPLED_PARAMETERS
     }
     truths["phase"] = np.mod(truths["phase"], np.pi)
+    apply_corner_style()
     fig = corner.corner(
         samples.values,
         labels=[labels[name] for name in SAMPLED_PARAMETERS],
         truths=[truths[name] for name in SAMPLED_PARAMETERS],
-        quantiles=[0.16, 0.5, 0.84],
-        show_titles=True,
-        title_fmt=".4g",
-        title_kwargs={"fontsize": 10},
-        bins=28,
-        smooth=1.0,
-        levels=(0.5, 0.9),
-        plot_datapoints=False,
-        fill_contours=True,
-        max_n_ticks=4,
+        **CORNER_KWARGS,
     )
     fig.savefig(outpath, dpi=150, bbox_inches="tight")
     plt.close(fig)

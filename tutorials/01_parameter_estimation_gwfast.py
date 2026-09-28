@@ -33,6 +33,7 @@ import gwfast.gwfastGlobals as glob
 from gwfast.fisherTools import CovMatr, check_covariance, fixParams
 from gwfast.gwfastUtils import GPSt_to_LMST, th_phi_from_ra_dec
 from gwfast.network import DetNet
+from plot_style import CORNER_KWARGS, apply_corner_style
 from gwfast.signal import GWSignal
 from gwfast.waveforms import IMRPhenomD
 
@@ -271,20 +272,12 @@ def plot_fisher_corner(
     )
     rng = np.random.default_rng(CORNER_SEED)
     samples = rng.multivariate_normal(mean, covariance_display, size=N_CORNER_SAMPLES)
+    apply_corner_style()
     fig = corner.corner(
         samples,
         labels=[CORNER_LABELS[name] for name in SAMPLED_PARAMETERS],
         truths=mean,
-        quantiles=[0.16, 0.5, 0.84],
-        show_titles=True,
-        title_fmt=".4g",
-        title_kwargs={"fontsize": 10},
-        bins=28,
-        smooth=1.0,
-        levels=(0.5, 0.9),
-        plot_datapoints=False,
-        fill_contours=True,
-        max_n_ticks=4,
+        **CORNER_KWARGS,
     )
     fig.savefig(outpath, dpi=150, bbox_inches="tight")
     plt.close(fig)
