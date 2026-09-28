@@ -29,7 +29,24 @@ rate_unlensed, unlensed_param_detectable = ler.unlensed_rate()
 
 # Sample lensed parameters:
 lensed_param = ler.lensed_cbc_statistics(size=100000, batch_size=50000, resume=True)
+# include other useful parameters in the output dictionary.
+# It is omitted by default to save runtime and memory.
+# For theta_E, n_images, mass_1, mass_2, luminosity_distance:
+lensed_param = ler.recover_redundant_parameters(lensed_param)
+# For effective_luminosity_distance, effective_geocent_time, effective_phase, effective_ra, effective_dec:
+lensed_param = ler.produce_effective_params(lensed_param)
 
+# Calculate the detection rate for lensed events
+rate_lensed, lensed_param_detectable = ler.lensed_rate()
+
+print(f"\n=== Lensed Detection Rate Summary ===")
+print(f"Detectable event rate: {rate_lensed:.2e} events per year")
+print(f"Total event rate: {ler.normalization_pdf_z_lensed:.2e} events per year")
+print(f"Percentage fraction of the detectable events: {rate_lensed/ler.normalization_pdf_z_lensed*100:.2e}%")
+
+# Recover redundant parameters (like theta_E, n_images, mass_1, mass_2, luminosity_distance) for the detectable lensed events
+lensed_param_detectable = ler.recover_redundant_parameters(lensed_param_detectable)
+lensed_param_detectable = ler.produce_effective_params(lensed_param_detectable)
 
 
 
