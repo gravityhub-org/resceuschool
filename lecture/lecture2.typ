@@ -8,8 +8,6 @@
 
 #title-slide([Gravitational-wave lensing], subtitle: [theoretical minimum])
 
-
-
 // =============================================================================
 // SLIDE RULES (Copilot / agent footer) — keep at END of every deck
 // (lecture1.typ / lecture2.typ — always both).

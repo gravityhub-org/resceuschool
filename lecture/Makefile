@@ -1,24 +1,44 @@
 TYPST ?= $(shell command -v typst 2>/dev/null || echo $(HOME)/.local/bin/typst)
-REPO_ROOT := $(abspath ../../..)
-PYTHON3 ?= python3
+UV ?= uv
+REPO_ROOT := $(abspath ..)
+PYTHON := $(UV) run --project $(REPO_ROOT) python
 
-# Local symlink typst/ -> ../../common/typst so `typst watch lecture1.typ` needs no --root.
-# Always two classroom meetings → two decks.
 DECKS := lecture1 lecture2
 PDFS := $(addsuffix .pdf,$(DECKS))
 
+LAPLACE_SCRIPT := figures/scripts/laplace_approximation.py
+ANIM_SCRIPT := figures/scripts/build_okular_animate_slide.py
+LAPLACE_GIF := figures/laplace_approximation.gif
+ANIM_PDF := figures/nested_laplace_okular.pdf
+
 all: $(PDFS)
 
-%.pdf: %.typ typst/theme.typ typst/slides.typ
-	$(TYPST) compile $< $@
+# Laplace GIF (and still PDF) — analytical 1D/2D steps
+$(LAPLACE_GIF) figures/laplace_approximation.pdf: $(LAPLACE_SCRIPT)
+	$(PYTHON) $(LAPLACE_SCRIPT)
+
+# Okular-playable dual animation page (LaTeX animate widgets)
+$(ANIM_PDF): $(ANIM_SCRIPT) $(LAPLACE_GIF) figures/external/nested_sampling.gif
+	$(PYTHON) $(ANIM_SCRIPT) animate
+
+# lecture1: Typst placeholder, then splice Okular animate page over the GIF slide
+lecture1.typst.pdf: lecture1.typ typst/theme.typ typst/slides.typ $(LAPLACE_GIF)
+	$(TYPST) compile lecture1.typ $@
+
+lecture1.pdf: lecture1.typst.pdf $(ANIM_PDF)
+	$(PYTHON) $(ANIM_SCRIPT) splice
+
+lecture2.pdf: lecture2.typ typst/theme.typ typst/slides.typ
+	$(TYPST) compile lecture2.typ $@
 
 watch-lecture1: typst/theme.typ typst/slides.typ
-	$(TYPST) watch lecture1.typ lecture1.pdf
+	$(TYPST) watch lecture1.typ lecture1.typst.pdf
 
 watch-lecture2: typst/theme.typ typst/slides.typ
 	$(TYPST) watch lecture2.typ lecture2.pdf
 
 clean:
-	rm -f lecture1.pdf lecture2.pdf main.pdf
+	rm -f lecture1.pdf lecture1.typst.pdf lecture2.pdf main.pdf
+	rm -f figures/nested_laplace_okular.pdf
 
 .PHONY: all clean watch-lecture1 watch-lecture2

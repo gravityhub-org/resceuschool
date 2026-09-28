@@ -12,7 +12,6 @@
 #figure-slide(
   [How to get from merging black hole to a detector?],
   image("figures/bbh_polarisation_detector.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit: [],
 )
 
 // Make a slide with Bayesian analysis (column figure left, text right) On the left, the famous GW150914 gravitational wave with illustration (from the internet/external source). On the right, text explaining the Bayesian analysis of gravitational wave data, including likelihood, prior, posterior, and evidence. 
@@ -31,37 +30,37 @@
   - Evidence $Z$: overall probability of the data under the model.
 ]
 
-// Double column figure with nested sampling figures/external/nested_sampling.gif (credits: David Yallup) and Laplace's approximation figures/laplace_approximation.pdf (credits: course-made).
-#two-figure-columns-slide(
+// Nested sampling + Laplace GIFs (figures only). Typst freezes GIF frames;
+// `make lecture1.pdf` splices an Okular-playable LaTeX-animate page over this.
+#figure-slide(
   [How to get from a detector to merging black hole?],
   image("figures/external/nested_sampling.gif", width: 100%, height: 100%, fit: "contain"),
-  image("figures/laplace_approximation.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit-a: [Credit: David Yallup],
-  credit-b: [],
-)[
-  - Nested sampling: a numerical method for computing the evidence $Z$ and exploring the posterior $p(phi|d)$.
-  - Laplace's approximation: an analytical method for approximating the posterior $p(phi|d)$ as a Gaussian distribution around the maximum a posteriori (MAP) estimate.
-]
+  credit: [Credit: David Yallup],
+)
+// Nested sampling + Laplace GIFs (figures only). Typst freezes GIF frames;
+// `make lecture1.pdf` splices an Okular-playable LaTeX-animate page over this.
+#figure-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/laplace_approximation.gif", width: 100%, height: 100%, fit: "contain"),
+  credit: [],
+)
 
 // Lens set up: Geometry 
 #figure-slide(
   [What is geometrical time delay?],
   image("figures/lens_geometry.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit: [],
 )
 
 // Lens set up: Fermat potential
 #figure-slide(
   [What is lensing time delay?],
   image("figures/lens_geometry_deflection.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit: [],
 )
 
 // Explain dimensionless variables and lens equation
 #columns-slide(
   [Why are dimensionless quantities useful?],
   image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit: [],
 )[
   - Dimensionless variables: 
    - $vec(x) = vec(theta) / theta_L$
@@ -91,7 +90,6 @@
     [$vec(y) = vec(x) - theta_E |vec(x)|$],
     [$vec(y) = vec(x) + theta_E |vec(x)|$],
   ),
-  credit: [],
 )[
   - The lens equation is $vec(y) = vec(x) - nabla psi_(L) (vec(x))$.
   - For a singular isothermal sphere, $psi(vec(theta)) = theta_E |vec(theta)|$.
@@ -102,7 +100,6 @@
   [Where are the images for a singular isothermal sphere?],
   image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
   [(a) $vec(y) = vec(x) - vec(x) / |vec(x)|$],
-  credit: [],
 )[
   - For a singular isothermal sphere, $psi_(L)(vec(x)) = |vec(x)|$.
   - The gradient is $nabla psi_(L)(vec(x)) = vec(x) / |vec(x)|$.
