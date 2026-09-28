@@ -12,6 +12,7 @@ dynesty run resumes from bilby's checkpoint using the saved injection data.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import bilby
@@ -46,6 +47,7 @@ DETECTORS = ["H1", "L1", "V1", "K1"]
 # Need enough live points for stable corner contours (≪100 → ragged / empty levels).
 NLIVE = 300
 DLOGZ = 0.5
+NPOOL = int(os.environ.get("NPOOL", "8"))
 
 # --- Injection truth (GW150914-like masses and sky; distance chosen for strong LHVK SNR) ---
 TRIGGER_GPS = 1_384_782_888.634
@@ -338,7 +340,7 @@ def run_or_resume_sampler(
         sampler="dynesty",
         nlive=NLIVE,
         dlogz=DLOGZ,
-        npool=1,
+        npool=NPOOL,
         outdir=str(RUN_DIR),
         label=LABEL,
         resume=True,

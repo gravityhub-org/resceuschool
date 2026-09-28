@@ -14,6 +14,7 @@ of image 1 is fixed at t1 ≡ 0; absolute timing is carried by geocent_time.
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 
 import bilby
@@ -43,6 +44,7 @@ IFO_CACHE_PATH = RUN_DIR / "injection_ifos.npz"
 # Nested sampling: 6 continuous + 2 discrete Morse factors.
 NLIVE = 300
 DLOGZ = 0.5
+NPOOL = int(os.environ.get("NPOOL", "8"))
 
 
 def _load_pe01():
@@ -462,7 +464,7 @@ def run_or_resume_sampler(
         sampler="dynesty",
         nlive=NLIVE,
         dlogz=DLOGZ,
-        npool=1,
+        npool=NPOOL,
         outdir=str(RUN_DIR),
         label=LABEL,
         resume=True,
