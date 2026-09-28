@@ -340,22 +340,18 @@
   }
 }
 
-/// Last content slide before the Copilot footer: instructor office photo + ask questions.
-/// Image: `typst/assets/otto_office.jpg` (path relative to `lecture/` when compiling).
+/// Last content slide before the Copilot footer: ask questions (no figure).
 /// Must appear once at the end of every classroom deck (before `slide_rules_footer`).
 #let office-qa-slide() = {
-  columns-slide(
-    [Questions?],
-    image(
-      "assets/otto_office.jpg",
-      width: 100%,
-      height: 100%,
-      fit: "contain",
-    ),
-  )[
-    - Please ask questions — after class, by email, or in office hours.
-    - Instructor: Otto A. Hannuksela (`oahannuksela\@cuhk.edu.hk`).
-  ]
+  _content-page([Questions?], {
+    set text(size: col-text-size)
+    set par(leading: 0.65em)
+    set list(tight: true, spacing: 0.55em)
+    align(horizon, block(width: 100%, inset: (left: 0.1em, right: 0.45em), [
+      - Please ask questions — after class, by email, or in office hours.
+      - Instructor: Otto A. Hannuksela (`oahannuksela\@cuhk.edu.hk`).
+    ]))
+  })
 }
 
 /// One page: poster + MP4. Filename shown at bottom (clickable).
