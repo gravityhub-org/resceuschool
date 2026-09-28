@@ -8,6 +8,27 @@
 
 #title-slide([Gravitational-wave lensing], subtitle: [theoretical minimum])
 
+// Full-page figure with gw history (no title)
+#figure-slide(
+  [],
+  image("figures/gw-history.png", width: 100%, height: 100%, fit: "contain"),
+  credit: [],
+)
+
+// Full-page figure with lens history (no title)
+#figure-slide(
+  [],
+  image("figures/lens-history.png", width: 100%, height: 100%, fit: "contain"),
+  credit: [],
+)
+
+// Full-page figure with GW lens forecasts
+#figure-slide(
+  [],
+  image("figures/gw-lens-forecasts.png", width: 100%, height: 100%, fit: "contain"),
+  credit: [],
+)
+
 // Make figure slideof the binary black hole with TT gauge and detector
 #figure-slide(
   [How to get from merging black hole to a detector?],
