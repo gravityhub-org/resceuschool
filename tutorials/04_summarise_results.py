@@ -1,23 +1,3 @@
-#!/usr/bin/env python3
-"""
-Summarise bilby PE results from tutorials 01–03.
-
-Loads priors from each PE script (``build_priors``) and, when result JSONs
-exist:
-
-  01  non-lensed model on unlensed injection
-  02  millilensed model on unlensed injection
-  03m millilensed model on lensed injection
-  03n non-lensed model on lensed injection
-
-prints (priors) free priors + shared-parameter comparability, then
-(a) evidences, (b) lensed-to-non-lensed Bayes factors for both injections,
-(c) search-parameter medians with 1-σ widths as (X±Y), and (d) overlay
-posterior corners of shared parameters for each injection.
-
-Use ``--priors-only`` to print the prior table without loading result files.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -31,15 +11,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bilby.core.result import Result
 
+# Plot style/paths
 from plot_style import CORNER_KWARGS, apply_corner_style
-
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent # Take absolute filepath
 OUTPUT_DIR = ROOT / "output" / "04_summarise_results"
 COMPARISON_UNLENSED_PATH = OUTPUT_DIR / "comparison_unlensed_injection.png"
 COMPARISON_LENSED_PATH = OUTPUT_DIR / "comparison_lensed_injection.png"
+LENS_RECOVERY_UNLENSED_PATH = OUTPUT_DIR / "lens_recovery_unlensed_injection.png"
+LENS_RECOVERY_LENSED_PATH = OUTPUT_DIR / "lens_recovery_lensed_injection.png"
 
 # Distance is the analogous free amplitude parameter across models.
 DISTANCE_ALIAS = ("luminosity_distance", "D1")
+
+# Image-parameter corner order (t1 ≡ geocent_time − TRIGGER_GPS; t2 = delay).
+LENS_CORNER_KEYS = ("D1", "D2", "t1", "t2", "n1", "n2")
 
 PARAM_LABELS = {
     "chirp_mass": r"$\mathcal{M}$",
@@ -48,6 +33,7 @@ PARAM_LABELS = {
     "phase": r"$\phi$",
     "D1": r"$d_{L,1}$ (Mpc)",
     "D2": r"$d_{L,2}$ (Mpc)",
+    "t1": r"$\Delta t_1$ (s)",
     "t2": r"$t_2$ (s)",
     "n1": r"$n_1$",
     "n2": r"$n_2$",
@@ -469,6 +455,135 @@ def print_and_plot_comparisons(
     return plotted
 
 
+def lens_recovery_columns(result: Result) -> dict[str, np.ndarray]:
+    """
+    Build (D1, D2, t1, t2, n1, n2) from a millilensed posterior.
+
+    t1 is geocent_time − TRIGGER_GPS (image-1 absolute time relative to the
+    trigger); t2 is the relative image-2 delay sampled by the PE.
+    """
+    required = ("D1", "D2", "geocent_time", "t2", "n1", "n2")
+    missing = [name for name in required if name not in result.posterior]
+    if missing:
+        raise KeyError(
+            "Millilensed result missing columns for lens recovery plot: "
+            + ", ".join(missing)
+        )
+    return {
+        "D1": np.asarray(result.posterior["D1"], dtype=float),
+        "D2": np.asarray(result.posterior["D2"], dtype=float),
+        "t1": np.asarray(result.posterior["geocent_time"], dtype=float) - TRIGGER_GPS,
+        "t2": np.asarray(result.posterior["t2"], dtype=float),
+        "n1": np.asarray(result.posterior["n1"], dtype=float),
+        "n2": np.asarray(result.posterior["n2"], dtype=float),
+    }
+
+
+def lens_recovery_truths(injection: str) -> dict[str, float]:
+    """Truth markers for lens corners; NaN omits the marker in corner."""
+    t1_truth = float(pe01.INJECTION["geocent_time"] - TRIGGER_GPS)
+    d1_truth = float(pe01.INJECTION["luminosity_distance"])
+    if injection == "lensed":
+        pe03 = _load_tutorial_module(
+            "03_parameter_estimation_millisecondlens_on_lensed.py",
+            "pe03_for_lens_truths",
+        )
+        inj = pe03.INJECTION
+        return {
+            "D1": float(inj["D1"]),
+            "D2": float(inj["D2"]),
+            "t1": float(inj["geocent_time"] - TRIGGER_GPS),
+            "t2": float(inj["t2"]),
+            "n1": float(inj["n1"]),
+            "n2": float(inj["n2"]),
+        }
+    if injection == "unlensed":
+        return {
+            "D1": d1_truth,
+            "D2": np.nan,  # second image absent / unconstrained
+            "t1": t1_truth,
+            "t2": np.nan,
+            "n1": 0.0,
+            "n2": np.nan,
+        }
+    raise ValueError(f"Unknown injection kind: {injection!r}")
+
+
+def _lens_corner_ranges(
+    columns: dict[str, np.ndarray],
+    truths: dict[str, float],
+    pad_frac: float = 0.05,
+) -> list[tuple[float, float]]:
+    ranges: list[tuple[float, float]] = []
+    for key in LENS_CORNER_KEYS:
+        if key in ("n1", "n2"):
+            ranges.append((-0.1, 1.1))
+            continue
+        arr = columns[key]
+        vals = [float(np.min(arr)), float(np.max(arr))]
+        truth = truths[key]
+        if np.isfinite(truth):
+            vals.append(float(truth))
+        lo, hi = min(vals), max(vals)
+        pad = pad_frac * (hi - lo) if hi > lo else 0.01
+        ranges.append((lo - pad, hi + pad))
+    return ranges
+
+
+def plot_lens_recovery(
+    result: Result,
+    outpath: Path,
+    title: str,
+    truths: dict[str, float],
+) -> list[str]:
+    """Corner of image parameters (dL1, dL2, t1, t2, n1, n2) for one millilensed run."""
+    columns = lens_recovery_columns(result)
+    samples = np.column_stack([columns[key] for key in LENS_CORNER_KEYS])
+    labels = [PARAM_LABELS[key] for key in LENS_CORNER_KEYS]
+    truth_list = [truths[key] for key in LENS_CORNER_KEYS]
+
+    apply_corner_style()
+    fig = corner.corner(
+        samples,
+        labels=labels,
+        truths=truth_list,
+        range=_lens_corner_ranges(columns, truths),
+        **CORNER_KWARGS,
+    )
+    fig.suptitle(title, y=1.02)
+    outpath.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(outpath, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Wrote {outpath}")
+    return list(LENS_CORNER_KEYS)
+
+
+def print_and_plot_lens_recoveries(
+    results: dict[str, Result],
+    output_dir: Path,
+) -> dict[str, list[str]]:
+    print("\n(e) Millilensed image-parameter recovery (dL1, dL2, t1, t2, n1, n2)")
+    print("-" * 72)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    plotted = {
+        "unlensed": plot_lens_recovery(
+            results["02"],
+            output_dir / "lens_recovery_unlensed_injection.png",
+            title="Unlensed injection: millilensed image-parameter recovery",
+            truths=lens_recovery_truths("unlensed"),
+        ),
+        "lensed": plot_lens_recovery(
+            results["03m"],
+            output_dir / "lens_recovery_lensed_injection.png",
+            title="Lensed injection: millilensed image-parameter recovery",
+            truths=lens_recovery_truths("lensed"),
+        ),
+    }
+    for injection, keys in plotted.items():
+        print(f"  {injection} injection lens parameters: {', '.join(keys)}")
+    return plotted
+
+
 def summarise(
     run_specs: dict[str, RunSpec] | None = None,
     output_dir: Path | None = None,
@@ -484,6 +599,7 @@ def summarise(
     print_bayes_factors(specs, results)
     print_parameter_summaries(specs, results)
     print_and_plot_comparisons(results, out)
+    print_and_plot_lens_recoveries(results, out)
     print(f"\nSummary figures under:\n  {out}\n")
     return results
 

@@ -24,11 +24,11 @@ ler = LeR(npool=6)
 
 
 # Sample non-lensed parameters:
-unlensed_param = ler.unlensed_cbc_statistics(size=100000, batch_size=50000, resume=True)
+unlensed_param = ler.unlensed_cbc_statistics(size=1000000, batch_size=50000, resume=True)
 rate_unlensed, unlensed_param_detectable = ler.unlensed_rate()
 
 # Sample lensed parameters:
-lensed_param = ler.lensed_cbc_statistics(size=100000, batch_size=50000, resume=True)
+lensed_param = ler.lensed_cbc_statistics(size=1000000, batch_size=50000, resume=True)
 # include other useful parameters in the output dictionary.
 # It is omitted by default to save runtime and memory.
 # For theta_E, n_images, mass_1, mass_2, luminosity_distance:

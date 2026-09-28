@@ -6,11 +6,15 @@
 #   make millilens        # millilensing PE on unlensed 01 data
 #   make millilens-lensed # millilensing PE on a lensed two-image injection
 #   make nonlensed-on-lensed  # tutorial-01 PE (unlensed model) on that lensed signal
-#   make summarise        # evidences, Bayes factors, shared-parameter overlays
+#   make summarise        # evidences, Bayes factors, overlays + lens recovery
+#   make ler              # LeR rates (05) + forecast PDFs (06)
+#   make forecasts        # LeR forecast PDFs from ler_data (06; needs ler)
 #   make clean / clean-gwfast / clean-millilens / clean-millilens-lensed /
-#        clean-nonlensed-on-lensed / clean-summarise / clean-all
+#        clean-nonlensed-on-lensed / clean-summarise / clean-ler /
+#        clean-forecasts / clean-all
 #   make force / force-gwfast / force-millilens / force-millilens-lensed /
-#        force-nonlensed-on-lensed / force-summarise / force-all
+#        force-nonlensed-on-lensed / force-summarise / force-ler /
+#        force-forecasts / force-all
 #
 # Products are file targets, so a completed run is a no-op. Interrupted
 # sampling runs resume from the sampler checkpoint (same cached injection).
@@ -87,16 +91,47 @@ SUMMARISE_SCRIPT := 04_summarise_results.py
 SUMMARISE_OUTDIR := output/04_summarise_results
 SUMMARISE_UNLENSED := $(SUMMARISE_OUTDIR)/comparison_unlensed_injection.png
 SUMMARISE_LENSED := $(SUMMARISE_OUTDIR)/comparison_lensed_injection.png
-SUMMARISE_PRODUCTS := $(SUMMARISE_UNLENSED) $(SUMMARISE_LENSED)
+SUMMARISE_LENS_RECOVERY_UNLENSED := $(SUMMARISE_OUTDIR)/lens_recovery_unlensed_injection.png
+SUMMARISE_LENS_RECOVERY_LENSED := $(SUMMARISE_OUTDIR)/lens_recovery_lensed_injection.png
+SUMMARISE_PRODUCTS := $(SUMMARISE_UNLENSED) $(SUMMARISE_LENSED) \
+	$(SUMMARISE_LENS_RECOVERY_UNLENSED) $(SUMMARISE_LENS_RECOVERY_LENSED)
+
+# --- LeR rates (tutorial 05) ---
+LER_SCRIPT := 05_ler.py
+LER_DATADIR := ler_data
+LER_UNLENSED := $(LER_DATADIR)/unlensed_param.json
+LER_UNLENSED_DET := $(LER_DATADIR)/unlensed_param_detectable.json
+LER_LENSED := $(LER_DATADIR)/lensed_param.json
+LER_LENSED_DET := $(LER_DATADIR)/lensed_param_detectable.json
+LER_PRODUCTS := $(LER_UNLENSED) $(LER_UNLENSED_DET) $(LER_LENSED) $(LER_LENSED_DET)
+
+# --- LeR forecast plots (tutorial 06) ---
+FORECAST_SCRIPT := 06_plot_forecasts.py
+FORECAST_OUTDIR := forecasts
+FORECAST_PRODUCTS := \
+	$(FORECAST_OUTDIR)/sl_intrinsic_source_redshift.pdf \
+	$(FORECAST_OUTDIR)/detectable_source_redshift.pdf \
+	$(FORECAST_OUTDIR)/comparison_source_redshift.pdf \
+	$(FORECAST_OUTDIR)/sl_intrinsic_velocity_dispersion_vs_redshift.pdf \
+	$(FORECAST_OUTDIR)/detectable_velocity_dispersion_vs_redshift.pdf \
+	$(FORECAST_OUTDIR)/comparison_velocity_dispersion_vs_redshift.pdf \
+	$(FORECAST_OUTDIR)/sl_intrinsic_einstein_radius.pdf \
+	$(FORECAST_OUTDIR)/detectable_einstein_radius.pdf \
+	$(FORECAST_OUTDIR)/comparison_einstein_radius.pdf \
+	$(FORECAST_OUTDIR)/sl_intrinsic_time_delays.pdf \
+	$(FORECAST_OUTDIR)/detectable_time_delays.pdf \
+	$(FORECAST_OUTDIR)/comparison_time_delays.pdf
 
 .PHONY: all bilby gwfast millilens millilens-lensed nonlensed-on-lensed summarise \
+	ler forecasts \
 	clean clean-gwfast clean-millilens clean-millilens-lensed \
-	clean-nonlensed-on-lensed clean-summarise clean-all \
+	clean-nonlensed-on-lensed clean-summarise clean-ler clean-forecasts clean-all \
 	force force-gwfast force-millilens force-millilens-lensed \
-	force-nonlensed-on-lensed force-summarise force-all help
+	force-nonlensed-on-lensed force-summarise force-ler force-forecasts force-all help
 
 # Full tutorial pipeline. `summarise` pulls in 01/02/03m/03n via result deps;
-# gwfast is independent. Use `make -j` to overlap independent PE runs.
+# gwfast is independent. LeR/forecasts are separate (heavy sampling). Use
+# `make -j` to overlap independent PE runs.
 all: summarise gwfast
 
 bilby: $(BILBY_PRODUCTS)
@@ -110,6 +145,10 @@ millilens-lensed: $(MILLENS_LENSED_PRODUCTS)
 nonlensed-on-lensed: $(NONLENSED_LENSED_PRODUCTS)
 
 summarise: $(SUMMARISE_PRODUCTS)
+
+ler: $(LER_PRODUCTS)
+
+forecasts: $(FORECAST_PRODUCTS)
 
 # Grouped targets (GNU make ≥ 4.3): one recipe, no re-run once products exist.
 $(BILBY_PRODUCTS) &:
@@ -157,6 +196,32 @@ $(SUMMARISE_PRODUCTS) &: $(BILBY_RESULT) $(MILLENS_RESULT) $(MILLENS_LENSED_RESU
 	$(UV) run python $(SUMMARISE_SCRIPT)
 	@test -f $(SUMMARISE_UNLENSED)
 	@test -f $(SUMMARISE_LENSED)
+	@test -f $(SUMMARISE_LENS_RECOVERY_UNLENSED)
+	@test -f $(SUMMARISE_LENS_RECOVERY_LENSED)
+
+# LeR writes under ler_data/; resume=True makes re-runs cheap once JSONs exist.
+$(LER_PRODUCTS) &:
+	$(UV) run python $(LER_SCRIPT)
+	@test -f $(LER_UNLENSED)
+	@test -f $(LER_UNLENSED_DET)
+	@test -f $(LER_LENSED)
+	@test -f $(LER_LENSED_DET)
+
+# Forecast PDFs need the LeR JSONs; 06 regenerates detectable lensed if missing.
+$(FORECAST_PRODUCTS) &: $(LER_PRODUCTS)
+	$(UV) run python $(FORECAST_SCRIPT)
+	@test -f $(FORECAST_OUTDIR)/sl_intrinsic_source_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/detectable_source_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/comparison_source_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/sl_intrinsic_velocity_dispersion_vs_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/detectable_velocity_dispersion_vs_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/comparison_velocity_dispersion_vs_redshift.pdf
+	@test -f $(FORECAST_OUTDIR)/sl_intrinsic_einstein_radius.pdf
+	@test -f $(FORECAST_OUTDIR)/detectable_einstein_radius.pdf
+	@test -f $(FORECAST_OUTDIR)/comparison_einstein_radius.pdf
+	@test -f $(FORECAST_OUTDIR)/sl_intrinsic_time_delays.pdf
+	@test -f $(FORECAST_OUTDIR)/detectable_time_delays.pdf
+	@test -f $(FORECAST_OUTDIR)/comparison_time_delays.pdf
 
 clean:
 	rm -rf $(BILBY_OUTDIR)
@@ -176,8 +241,14 @@ clean-nonlensed-on-lensed:
 clean-summarise:
 	rm -rf $(SUMMARISE_OUTDIR)
 
+clean-ler:
+	rm -rf $(LER_DATADIR)
+
+clean-forecasts:
+	rm -rf $(FORECAST_OUTDIR)
+
 clean-all: clean clean-gwfast clean-millilens clean-millilens-lensed \
-	clean-nonlensed-on-lensed clean-summarise
+	clean-nonlensed-on-lensed clean-summarise clean-ler clean-forecasts
 
 force: clean
 	$(MAKE) bilby
@@ -197,8 +268,15 @@ force-nonlensed-on-lensed: clean-nonlensed-on-lensed
 force-summarise: clean-summarise
 	$(MAKE) summarise
 
+force-ler: clean-ler
+	$(MAKE) ler
+
+force-forecasts: clean-forecasts
+	$(MAKE) forecasts
+
 force-all: clean-all
 	$(MAKE) all
+	$(MAKE) forecasts
 
 help:
 	@echo "Targets:"
@@ -208,15 +286,19 @@ help:
 	@echo "  make millilens            Millilensing PE on unlensed 01 data"
 	@echo "  make millilens-lensed     Millilensing PE on a lensed two-image injection"
 	@echo "  make nonlensed-on-lensed  Tutorial-01 PE (unlensed model) on lensed data"
-	@echo "  make summarise            Evidences, Bayes factors, shared-parameter overlays"
+	@echo "  make summarise            Evidences, Bayes factors, overlays + lens recovery"
+	@echo "  make ler                  LeR unlensed/lensed statistics + rates (05)"
+	@echo "  make forecasts            LeR forecast PDFs (06; builds ler if needed)"
 	@echo "  make clean                Remove bilby (01) output"
 	@echo "  make clean-gwfast         Remove gwfast output"
 	@echo "  make clean-millilens      Remove millilensing-on-unlensed output"
 	@echo "  make clean-millilens-lensed  Remove millilensing-on-lensed output"
 	@echo "  make clean-nonlensed-on-lensed  Remove nonlensed-on-lensed output"
 	@echo "  make clean-summarise      Remove summarise output"
-	@echo "  make clean-all            Remove all tutorial outputs"
-	@echo "  make force / force-*      Clean and rebuild a target (force-all = everything)"
+	@echo "  make clean-ler            Remove ler_data/"
+	@echo "  make clean-forecasts      Remove forecasts/"
+	@echo "  make clean-all            Remove all tutorial outputs (incl. ler/forecasts)"
+	@echo "  make force / force-*      Clean and rebuild a target (force-all = PE + forecasts)"
 	@echo ""
 	@echo "Environment (exported to recipes):"
 	@echo "  MPLBACKEND=$(MPLBACKEND)   matplotlib backend (default Agg for headless)"
@@ -253,3 +335,11 @@ help:
 	@echo "Summarise products:"
 	@echo "  $(SUMMARISE_UNLENSED)"
 	@echo "  $(SUMMARISE_LENSED)"
+	@echo ""
+	@echo "LeR (05) products:"
+	@echo "  $(LER_UNLENSED)"
+	@echo "  $(LER_UNLENSED_DET)"
+	@echo "  $(LER_LENSED)"
+	@echo "  $(LER_LENSED_DET)"
+	@echo ""
+	@echo "Forecast (06) products: $(FORECAST_OUTDIR)/{sl_intrinsic,detectable,comparison}_*.pdf"
