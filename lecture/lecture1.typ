@@ -146,6 +146,29 @@
   image("figures/lens_geometry_amplification.pdf", width: 100%, height: 100%, fit: "contain"),
 )
 
+// strong_lensing_geometric_optics.png on the left, on the right, explain stationary phase approximation
+#columns-slide(
+  [How to get from a detector to merging black hole?],
+  image("figures/strong_lensing_geometric_optics.png", width: 100%, height: 100%, fit: "contain"),
+  credit: [Credit: David Yallup],
+)[
+  - Amplification factor
+  $
+    F(f) = t_L (f\/i) integral dif^2 x exp[ 2 pi i f Delta t(vec(x), vec(y)) ].
+  $ <eq:amplification_factor>
+  - GW:
+  $
+    h_(L,+/times)(f) = F(f) h_(+/times)(f).
+  $ <eq:lensed_waveform>
+  - Stationary phase approximation: Recovers the ray picture:
+  $
+    F(f) approx sum_("images") |mu(vec(x))|^(1/2) exp[ 2 pi i f Delta t(vec(x), vec(y)) - i pi n_(vec(x)) ].
+  $ <eq:stationary_phase_approximation>
+  - Note: Defined with *physics fourier convention* (different from numpy!!!!))
+]
+
+// Next lecture: Applications
+#title-slide([Next lecture], subtitle: [Applications of gravitational-wave lensing])
 
 //   (`typst watch lecture1.typ` from lecture/)
 // - #show: slides.with(…)  — footer = page n/N ONLY (no course chrome)
