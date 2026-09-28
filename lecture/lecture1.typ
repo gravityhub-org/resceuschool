@@ -206,8 +206,15 @@
   - Note: Defined with *physics fourier convention* (different from numpy!!!!))
 ]
 
+// Full-page figure of GW lensing degeneracies
+#figure-slide(
+  [What are the degeneracies in gravitational-wave lensing?],
+  image("figures/lens_degeneracies.pdf", width: 100%, height: 100%, fit: "contain"),
+  credit: [],
+)
+
 // Next lecture: Applications
-#title-slide([Next lecture], subtitle: [Applications of gravitational-wave lensing])
+#title-slide([Application], subtitle: [Applications of gravitational-wave lensing])
 
 //   (`typst watch lecture1.typ` from lecture/)
 // - #show: slides.with(…)  — footer = page n/N ONLY (no course chrome)

@@ -3,7 +3,7 @@ UV ?= uv
 REPO_ROOT := $(abspath ..)
 PYTHON := $(UV) run --project $(REPO_ROOT) python
 
-DECKS := lecture1 lecture2
+DECKS := lecture1 
 PDFS := $(addsuffix .pdf,$(DECKS))
 
 LAPLACE_SCRIPT := figures/scripts/laplace_approximation.py
@@ -28,17 +28,11 @@ lecture1.typst.pdf: lecture1.typ typst/theme.typ typst/slides.typ $(LAPLACE_GIF)
 lecture1.pdf: lecture1.typst.pdf $(ANIM_PDF)
 	$(PYTHON) $(ANIM_SCRIPT) splice
 
-lecture2.pdf: lecture2.typ typst/theme.typ typst/slides.typ
-	$(TYPST) compile lecture2.typ $@
-
 watch-lecture1: typst/theme.typ typst/slides.typ
 	$(TYPST) watch lecture1.typ lecture1.typst.pdf
 
-watch-lecture2: typst/theme.typ typst/slides.typ
-	$(TYPST) watch lecture2.typ lecture2.pdf
-
 clean:
-	rm -f lecture1.pdf lecture1.typst.pdf lecture2.pdf main.pdf
+	rm -f lecture1.pdf lecture1.typst.pdf main.pdf
 	rm -f figures/nested_laplace_okular.pdf
 
-.PHONY: all clean watch-lecture1 watch-lecture2
+.PHONY: all clean watch-lecture1
