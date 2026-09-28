@@ -263,7 +263,7 @@ def load_results(run_specs: dict[str, RunSpec]) -> dict[str, Result]:
         )
     results: dict[str, Result] = {}
     for key, spec in run_specs.items():
-        print(f"Loading {spec.key}: {spec.path}")
+        #print(f"Loading {spec.key}: {spec.path}")
         results[key] = bilby.core.result.read_in_result(filename=str(spec.path))
     return results
 
@@ -288,14 +288,11 @@ def prepare_series(name: str, series) -> np.ndarray:
 
 
 def print_evidences(run_specs: dict[str, RunSpec], results: dict[str, Result]) -> None:
-    print("\n(a) Evidences")
-    print("-" * 72)
+    print("Evidences")
     for key, spec in run_specs.items():
         result = results[key]
         print(
-            f"  [{key}] {spec.label}\n"
-            f"       ln Z = {result.log_evidence:.4f} ± {result.log_evidence_err:.4f}"
-            f"   (ln Z_noise = {result.log_noise_evidence:.4f})"
+                f"  [{key}] {spec.label}: ln F = {result.log_evidence:.4f} ± {result.log_evidence_err:.4f}"
         )
 
 
@@ -309,21 +306,19 @@ def bayes_factor(result_lensed: Result, result_nonlensed: Result) -> tuple[float
 
 
 def print_bayes_factors(run_specs: dict[str, RunSpec], results: dict[str, Result]) -> None:
-    print("\n(b) Bayes factors (lensed model / non-lensed model)")
-    print("-" * 72)
+    print("Bayes factors (lensed model / non-lensed model)")
     pairs = (
         ("unlensed injection", "02", "01"),
         ("lensed injection", "03m", "03n"),
     )
     for title, key_l, key_nl in pairs:
         ln_bf, sigma = bayes_factor(results[key_l], results[key_nl])
-        print(f"  {title}:")
-        print(f"    ln B_{{L/NL}} = {ln_bf:.4f} ± {sigma:.4f}")
-        if abs(ln_bf) < 700:
-            print(f"    B_{{L/NL}}    = {np.exp(ln_bf):.4g}")
-        else:
-            print(f"    B_{{L/NL}}    = exp({ln_bf:.4f})  (overflow in float)")
-        print(f"    runs: {run_specs[key_l].key} / {run_specs[key_nl].key}")
+        print(f"  {title}: ln B_{{L/NL}} = {ln_bf:.4f} ± {sigma:.4f}")
+        #if abs(ln_bf) < 700:
+        #    print(f"    B_{{L/NL}}    = {np.exp(ln_bf):.4g}")
+        #else:
+        #    print(f"    B_{{L/NL}}    = exp({ln_bf:.4f})  (overflow in float)")
+        #print(f"    runs: {run_specs[key_l].key} / {run_specs[key_nl].key}")
 
 
 def print_parameter_summaries(
@@ -381,7 +376,7 @@ def plot_model_comparison(
     """Overlay corner of shared parameters; return the pairs that were plotted."""
     pairs = shared_parameter_pairs(result_nonlensed, result_lensed)
     if not pairs:
-        print(f"  No shared parameters for '{title}'; skipping plot.")
+        #print(f"  No shared parameters for '{title}'; skipping plot.")
         return pairs
 
     n_draw = min(len(result_nonlensed.posterior), len(result_lensed.posterior), 5000)
@@ -421,7 +416,6 @@ def plot_model_comparison(
     outpath.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(outpath, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"  Wrote {outpath}")
     return pairs
 
 
@@ -429,8 +423,8 @@ def print_and_plot_comparisons(
     results: dict[str, Result],
     output_dir: Path,
 ) -> dict[str, list[tuple[str, str, str]]]:
-    print("\n(d) Shared-parameter posterior comparisons")
-    print("-" * 72)
+    #print("\n(d) Shared-parameter posterior comparisons")
+    #print("-" * 72)
     output_dir.mkdir(parents=True, exist_ok=True)
     plotted = {
         "unlensed": plot_model_comparison(
@@ -451,7 +445,7 @@ def print_and_plot_comparisons(
     for injection, pairs in plotted.items():
         if pairs:
             names = ", ".join(canon for canon, _, _ in pairs)
-            print(f"  {injection} injection shared parameters: {names}")
+            #print(f"  {injection} injection shared parameters: {names}")
     return plotted
 
 
@@ -554,7 +548,7 @@ def plot_lens_recovery(
     outpath.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(outpath, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"  Wrote {outpath}")
+    #print(f"  Wrote {outpath}")
     return list(LENS_CORNER_KEYS)
 
 
@@ -562,8 +556,8 @@ def print_and_plot_lens_recoveries(
     results: dict[str, Result],
     output_dir: Path,
 ) -> dict[str, list[str]]:
-    print("\n(e) Millilensed image-parameter recovery (dL1, dL2, t1, t2, n1, n2)")
-    print("-" * 72)
+    #print("\n(e) Millilensed image-parameter recovery (dL1, dL2, t1, t2, n1, n2)")
+    #print("-" * 72)
     output_dir.mkdir(parents=True, exist_ok=True)
     plotted = {
         "unlensed": plot_lens_recovery(
@@ -579,8 +573,8 @@ def print_and_plot_lens_recoveries(
             truths=lens_recovery_truths("lensed"),
         ),
     }
-    for injection, keys in plotted.items():
-        print(f"  {injection} injection lens parameters: {', '.join(keys)}")
+    #for injection, keys in plotted.items():
+    #    print(f"  {injection} injection lens parameters: {', '.join(keys)}")
     return plotted
 
 
@@ -589,7 +583,7 @@ def summarise(
     output_dir: Path | None = None,
     priors_only: bool = False,
 ) -> dict[str, Result] | None:
-    print_prior_table()
+    #print_prior_table()
     if priors_only:
         return None
     specs = run_specs if run_specs is not None else default_run_specs()
@@ -597,10 +591,10 @@ def summarise(
     results = load_results(specs)
     print_evidences(specs, results)
     print_bayes_factors(specs, results)
-    print_parameter_summaries(specs, results)
+    #print_parameter_summaries(specs, results)
     print_and_plot_comparisons(results, out)
     print_and_plot_lens_recoveries(results, out)
-    print(f"\nSummary figures under:\n  {out}\n")
+    print(f"\nSummary figures under:\n  {out}")
     return results
 
 

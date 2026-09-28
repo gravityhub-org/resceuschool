@@ -320,9 +320,9 @@ def run_or_resume_sampler(
         return bilby.core.result.read_in_result(filename=str(RESULT_PATH))
 
     likelihood = bilby.gw.likelihood.GravitationalWaveTransient(
-        interferometers=ifos,
-        waveform_generator=waveform_generator,
-        priors=priors,
+        interferometers=ifos, # What kind of detectors do we have? LIGO, Virgo, KAGRA, etc.
+        waveform_generator=waveform_generator, # What kind of waveform? 
+        priors=priors, # What do we assume about the parameters? (Fiducial)
     )
 
     resume_path = RUN_DIR / f"{LABEL}_resume.pickle"

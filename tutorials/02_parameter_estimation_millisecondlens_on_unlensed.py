@@ -139,7 +139,7 @@ def make_millilensing_waveform_generator() -> bilby.gw.waveform_generator.Wavefo
     return bilby.gw.waveform_generator.WaveformGenerator(
         duration=DURATION,
         sampling_frequency=SAMPLING_FREQUENCY,
-        frequency_domain_source_model=binary_black_hole_two_image_millilensing,
+        frequency_domain_source_model=binary_black_hole_two_image_millilensing, # Here we use lensed wf
         parameter_conversion=convert_to_lal_binary_black_hole_parameters,
         waveform_arguments=dict(
             waveform_approximant=WAVEFORM_APPROXIMANT,
@@ -467,9 +467,9 @@ def main() -> None:
         )
         return
 
-    priors = build_priors()
-    waveform_generator = make_millilensing_waveform_generator()
-    ifos = load_unlensed_injection()
+    priors = build_priors() # Priors include effective luminosity distances D1, D2, time delay t2, and Morse factors n1, n2.
+    waveform_generator = make_millilensing_waveform_generator() # Use _lensed_ waveform
+    ifos = load_unlensed_injection() # Same injection (run on unlensed)
 
     if not WAVEFORMS_PATH.exists():
         plot_lhvk_waveforms(ifos, WAVEFORMS_PATH)
@@ -477,7 +477,7 @@ def main() -> None:
     else:
         print(f"Keeping existing {WAVEFORMS_PATH}")
 
-    result = run_or_resume_sampler(ifos, waveform_generator, priors)
+    result = run_or_resume_sampler(ifos, waveform_generator, priors) # Run again
 
     if not CORNER_USUAL_PATH.exists():
         plot_usual_posteriors(result, CORNER_USUAL_PATH)

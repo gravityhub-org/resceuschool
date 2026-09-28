@@ -50,11 +50,11 @@ class DiscreteUniformMorse(Prior):
 def two_image_amplification(frequency_array, D1, D2, t2, n1, n2):
     """Complex millilensing amplification for two fixed images (t2 > t1 ≡ 0)."""
     frequency_array = np.asarray(frequency_array, dtype=float)
-    w = 1j * 2.0 * np.pi * frequency_array
+    w = 1j * 2.0 * np.pi * frequency_array # Convert to angular frequency
     f_geo = np.exp(-1j * n1 * np.pi) + (D1 / D2) * np.exp(
         w * t2 - 1j * n2 * np.pi
     )
-    return np.conj(f_geo)
+    return np.conj(f_geo) # Physics convention to engineering convention for bilby / LAL
 
 
 def binary_black_hole_two_image_millilensing(
