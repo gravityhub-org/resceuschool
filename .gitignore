@@ -61,3 +61,7 @@ main.pdf
 __pycache__/
 # Mail
 mail
+
+# Large LeR Monte Carlo catalogs (regenerate with 05_ler.py)
+tutorials/ler_data/lensed_param.json
+tutorials/ler_data/unlensed_param.json
