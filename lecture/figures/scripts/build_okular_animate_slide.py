@@ -92,9 +92,9 @@ def _slide_page_tex(
     credit_tex = ""
     if credit:
         credit_tex = (
-            r"\\[1.5mm]{\color{slidemuted}\fontsize{9.5}{11}\selectfont "
+            r"\vspace{1.5mm}\noindent{\color{slidemuted}\fontsize{9.5}{11}\selectfont "
             + credit
-            + "}"
+            + r"\par}"
         )
     pagebreak = r"\newpage" if newpage else ""
     # Fill remaining slide body (Typst figure-slide style): light panel + contain.

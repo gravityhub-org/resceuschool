@@ -1,124 +1,15 @@
-#import "typst/slides.typ": *
-
-#show: slides.with(
-  course: "",
-  week: "Gravitational-wave lensing · Lecture 1",
-  title: "Theoretical minimum",
-)
-
-#title-slide([Gravitational-wave lensing], subtitle: [theoretical minimum])
-
-// Make figure slideof the binary black hole with TT gauge and detector
-#figure-slide(
-  [How to get from merging black hole to a detector?],
-  image("figures/bbh_polarisation_detector.pdf", width: 100%, height: 100%, fit: "contain"),
-)
-
-// Make a slide with Bayesian analysis (column figure left, text right) On the left, the famous GW150914 gravitational wave with illustration (from the internet/external source). On the right, text explaining the Bayesian analysis of gravitational wave data, including likelihood, prior, posterior, and evidence. 
-#columns-slide(
-  [How to get from a detector to merging black hole?],
-  image("figures/external/gw150914_strain.pdf", width: 100%, height: 100%, fit: "contain"),
-  credit: [Credit: Abbott et al. (LIGO/Virgo) — Phys. Rev. Lett. 116, 061102 (2016).],
-)[
-  - Bayesian theorem
-    $
-      p(phi | d) = (L(phi) pi(phi)) / Z
-    $ <eq:bayes_theorem>
-  - Likelihood $L(phi)$: probability of observing the data given a gravitational-wave strain.
-  - Prior $pi(phi)$: Everything we know about binary black holes.
-  - Posterior $p(phi|d)$: Everything we know about this binary black hole after considering the data.
-  - Evidence $Z$: overall probability of the data under the model.
-]
-
-// Nested sampling GIF (full-slide). Typst freezes GIF frames;
-// `make lecture1.pdf` splices an Okular-playable animate page over this.
-#figure-slide(
-  [How to get from a detector to merging black hole?],
-  image("figures/external/nested_sampling.gif", width: 100%, height: 100%, fit: "contain"),
-  credit: [Credit: David Yallup],
-)
-
-// Laplace GIF (full-slide). Same Okular splice as the previous page.
-#figure-slide(
-  [How to get from a detector to merging black hole?],
-  image("figures/laplace_approximation.gif", width: 100%, height: 100%, fit: "contain"),
-)
-
-
-
-// Lens set up: Geometry 
-#figure-slide(
-  [What is geometrical time delay?],
-  image("figures/lens_geometry.pdf", width: 100%, height: 100%, fit: "contain"),
-)
-
-// Lens set up: Fermat potential
-#figure-slide(
-  [What is lensing time delay?],
-  image("figures/lens_geometry_deflection.pdf", width: 100%, height: 100%, fit: "contain"),
-)
-
-// Explain dimensionless variables and lens equation
-#columns-slide(
-  [Why are dimensionless quantities useful?],
-  image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
-)[
-  - Dimensionless variables: 
-   - $vec(x) = vec(theta) / theta_L$
-   - $vec(y) = vec( beta ) / theta_L$
-   - $psi_(L) (vec(x)) = psi(vec(x)) / theta_L^2$
-  - What is the time delay?
-  $
-    Delta t(vec(x), vec(y)) = t_L [ 1/2  |vec(x) - vec(y)|^2 - psi_(L)(vec(x)) ].
-  $ <eq:time_delay>
-  - Where are the images?
-  $
-    vec(y) = vec(x) - nabla psi_(L) (vec(x)).
-  $ <eq:lens_equation>
-  - How magnified are the images?
-  $
-    |mu(vec(x))|^(-1) = |(partial vec(y)) / ( partial vec(x) ) |.
-  $ <eq:magnification>
-]
-
-// MC Question: Suppose that the Singular isothermal sphere potential $psi(vec(theta)) = theta_E |vec(theta)|$. Where are the images in terms of the dimensionless variables $vec(x)$ and $vec(y)$?
-#mc-question-slide(
-  [Where are the images for a singular isothermal sphere?],
-  image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
-  (
-    [$vec(y) = vec(x) - vec(x) / |vec(x)|$],
-    [$vec(y) = vec(x) + theta_E vec(x) / |vec(x)|$],
-    [$vec(y) = vec(x) - theta_E |vec(x)|$],
-    [$vec(y) = vec(x) + theta_E |vec(x)|$],
-  ),
-)[
-  - The lens equation is $vec(y) = vec(x) - nabla psi_(L) (vec(x))$.
-  - For a singular isothermal sphere, $psi(vec(theta)) = theta_E |vec(theta)|$.
-]
-
-// Answer slide with derivation for images and for magnification and time delay
-#mc-answer-slide(
-  [Where are the images for a singular isothermal sphere?],
-  image("figures/lens_geometry_lens_equation.pdf", width: 100%, height: 100%, fit: "contain"),
-  [(a) $vec(y) = vec(x) - vec(x) / |vec(x)|$],
-)[
-  - For a singular isothermal sphere, $psi_(L)(vec(x)) = |vec(x)|$.
-  - The gradient is $nabla psi_(L)(vec(x)) = vec(x) / |vec(x)|$.
-  - Therefore, the lens equation becomes $vec(y) = vec(x) - vec(x) / |vec(x)|$.
-  - Setting x-axis aligned with image, the solutions are:
-  $
-    x = y plus.minus 1.
-  $
-  - The magnification
-  $
-    |mu(vec(x))|^(-1) = |(partial vec(y)) / ( partial vec(x) ) | = |1-|x|^(-1)|.
-  $
-  - The time delay
-  $
-    Delta t(x, y) = t_L [ 1/2  |x - y|^2 - psi_(L)(x) ] 
-  $
-]
-
+// =============================================================================
+// SLIDE RULES (Copilot / agent footer) — keep at END of every deck
+// (lecture1.typ / lecture2.typ — always both).
+// Canonical copy: typst/slide_rules_footer.typ
+// When rules change: update that file, then replace this block in each deck.
+// =============================================================================
+//
+// FRAMEWORK
+// - Dark theme: near-black bg (#121212), off-white text (#F2F2F2), soft cyan accent.
+//   Font: Atkinson Hyperlegible (low-vision letter distinction). Larger type + open leading.
+//   Figures sit on a light panel so dark-ink plots stay readable.
+// - Typst only. Import: #import "typst/slides.typ": *
 //   (`typst watch lecture1.typ` from lecture/)
 // - #show: slides.with(…)  — footer = page n/N ONLY (no course chrome)
 // - One constructor call = one PDF page (animation-slide = one page per frame)
