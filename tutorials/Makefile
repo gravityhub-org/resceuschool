@@ -1,25 +1,30 @@
 # RESCEU GW lensing school tutorials
 #
-#   make / make bilby     # bilby PE products (default)
-#   make cogwheel         # cogwheel PE products
+#   make / make all       # full pipeline: bilby + gwfast + millilens(+lensed) + nonlensed-on-lensed + summarise
+#   make bilby            # tutorial-01 unlensed PE
 #   make gwfast           # gwfast Fisher-matrix products
 #   make millilens        # millilensing PE on unlensed 01 data
 #   make millilens-lensed # millilensing PE on a lensed two-image injection
 #   make nonlensed-on-lensed  # tutorial-01 PE (unlensed model) on that lensed signal
-#   make summarise           # evidences, Bayes factors, shared-parameter overlays
-#   make clean / clean-cogwheel / clean-gwfast / clean-millilens / clean-millilens-lensed / clean-nonlensed-on-lensed / clean-summarise / clean-all
-#   make force / force-cogwheel / force-gwfast / force-millilens / force-millilens-lensed / force-nonlensed-on-lensed / force-summarise
+#   make summarise        # evidences, Bayes factors, shared-parameter overlays
+#   make clean / clean-gwfast / clean-millilens / clean-millilens-lensed /
+#        clean-nonlensed-on-lensed / clean-summarise / clean-all
+#   make force / force-gwfast / force-millilens / force-millilens-lensed /
+#        force-nonlensed-on-lensed / force-summarise / force-all
 #
 # Products are file targets, so a completed run is a no-op. Interrupted
 # sampling runs resume from the sampler checkpoint (same cached injection).
 # Editing the script does not rebuild by itself — use `make force*`.
+#
+# Parallelism: bilby dynesty uses NPOOL workers (default 8). Independent
+# targets can also be built concurrently, e.g. `make -j3 bilby millilens-lensed gwfast`.
 UV ?= uv
 # Headless plotting (bilby / matplotlib); override with e.g. MPLBACKEND=TkAgg if needed.
 export MPLBACKEND ?= Agg
 # Dynesty worker processes per bilby run (override with NPOOL=...).
 export NPOOL ?= 8
 
-# --- bilby ---
+# --- bilby (tutorial 01) ---
 BILBY_SCRIPT := 01_parameter_estimation.py
 BILBY_OUTDIR := output/01_parameter_estimation
 BILBY_RUNDIR := $(BILBY_OUTDIR)/bilby_run
@@ -28,15 +33,8 @@ BILBY_WAVEFORMS := $(BILBY_OUTDIR)/lhvk_waveforms.png
 BILBY_CORNER := $(BILBY_OUTDIR)/posterior_corner.png
 BILBY_RESULT := $(BILBY_RUNDIR)/$(BILBY_LABEL)_result.json
 BILBY_PRODUCTS := $(BILBY_WAVEFORMS) $(BILBY_CORNER) $(BILBY_RESULT)
-
-# --- cogwheel ---
-COGWHEEL_SCRIPT := 01_parameter_estimation_cogwheel.py
-COGWHEEL_OUTDIR := output/01_parameter_estimation_cogwheel
-COGWHEEL_RUNDIR := $(COGWHEEL_OUTDIR)/cogwheel_run
-COGWHEEL_WAVEFORMS := $(COGWHEEL_OUTDIR)/lhvk_waveforms.png
-COGWHEEL_CORNER := $(COGWHEEL_OUTDIR)/posterior_corner.png
-COGWHEEL_RESULT := $(COGWHEEL_RUNDIR)/samples.feather
-COGWHEEL_PRODUCTS := $(COGWHEEL_WAVEFORMS) $(COGWHEEL_CORNER) $(COGWHEEL_RESULT)
+# Shared strain cache produced by tutorial 01 (also used by millilens).
+BILBY_IFO_CACHE := $(BILBY_RUNDIR)/injection_ifos.npz
 
 # --- gwfast (Fisher matrix) ---
 GWFAST_SCRIPT := 01_parameter_estimation_gwfast.py
@@ -59,8 +57,6 @@ MILLENS_N1_PHASE := $(MILLENS_OUTDIR)/n1_vs_phase.png
 MILLENS_RESULT := $(MILLENS_RUNDIR)/$(MILLENS_LABEL)_result.json
 MILLENS_PRODUCTS := $(MILLENS_WAVEFORMS) $(MILLENS_CORNER) $(MILLENS_CORNER_LENS) \
 	$(MILLENS_N1_PHASE) $(MILLENS_RESULT)
-# Shared strain cache produced by tutorial 01.
-BILBY_IFO_CACHE := $(BILBY_RUNDIR)/injection_ifos.npz
 
 # --- millilensing PE on a lensed two-image injection ---
 MILLENS_LENSED_SCRIPT := 03_parameter_estimation_millisecondlens_on_lensed.py
@@ -93,17 +89,17 @@ SUMMARISE_UNLENSED := $(SUMMARISE_OUTDIR)/comparison_unlensed_injection.png
 SUMMARISE_LENSED := $(SUMMARISE_OUTDIR)/comparison_lensed_injection.png
 SUMMARISE_PRODUCTS := $(SUMMARISE_UNLENSED) $(SUMMARISE_LENSED)
 
-.PHONY: all bilby cogwheel gwfast millilens millilens-lensed nonlensed-on-lensed \
-	summarise clean clean-cogwheel clean-gwfast clean-millilens clean-millilens-lensed \
-	clean-nonlensed-on-lensed clean-summarise clean-all force force-cogwheel \
-	force-gwfast force-millilens force-millilens-lensed force-nonlensed-on-lensed \
-	force-summarise help
+.PHONY: all bilby gwfast millilens millilens-lensed nonlensed-on-lensed summarise \
+	clean clean-gwfast clean-millilens clean-millilens-lensed \
+	clean-nonlensed-on-lensed clean-summarise clean-all \
+	force force-gwfast force-millilens force-millilens-lensed \
+	force-nonlensed-on-lensed force-summarise force-all help
 
-all: bilby
+# Full tutorial pipeline. `summarise` pulls in 01/02/03m/03n via result deps;
+# gwfast is independent. Use `make -j` to overlap independent PE runs.
+all: summarise gwfast
 
 bilby: $(BILBY_PRODUCTS)
-
-cogwheel: $(COGWHEEL_PRODUCTS)
 
 gwfast: $(GWFAST_PRODUCTS)
 
@@ -121,12 +117,6 @@ $(BILBY_PRODUCTS) &:
 	@test -f $(BILBY_WAVEFORMS)
 	@test -f $(BILBY_CORNER)
 	@test -f $(BILBY_RESULT)
-
-$(COGWHEEL_PRODUCTS) &:
-	$(UV) run python $(COGWHEEL_SCRIPT)
-	@test -f $(COGWHEEL_WAVEFORMS)
-	@test -f $(COGWHEEL_CORNER)
-	@test -f $(COGWHEEL_RESULT)
 
 $(GWFAST_PRODUCTS) &:
 	$(UV) run python $(GWFAST_SCRIPT)
@@ -153,7 +143,8 @@ $(MILLENS_LENSED_PRODUCTS) &:
 	@test -f $(MILLENS_LENSED_CORNER_LENS)
 	@test -f $(MILLENS_LENSED_RESULT)
 
-# Shares the millilens-lensed strain cache; script creates it if missing.
+# Prefer the shared lensed strain cache from millilens-lensed when present;
+# the script can also create that cache itself if missing.
 $(NONLENSED_LENSED_PRODUCTS) &:
 	$(UV) run python $(NONLENSED_LENSED_SCRIPT)
 	@test -f $(NONLENSED_LENSED_WAVEFORMS)
@@ -170,9 +161,6 @@ $(SUMMARISE_PRODUCTS) &: $(BILBY_RESULT) $(MILLENS_RESULT) $(MILLENS_LENSED_RESU
 clean:
 	rm -rf $(BILBY_OUTDIR)
 
-clean-cogwheel:
-	rm -rf $(COGWHEEL_OUTDIR)
-
 clean-gwfast:
 	rm -rf $(GWFAST_OUTDIR)
 
@@ -188,14 +176,11 @@ clean-nonlensed-on-lensed:
 clean-summarise:
 	rm -rf $(SUMMARISE_OUTDIR)
 
-clean-all: clean clean-cogwheel clean-gwfast clean-millilens clean-millilens-lensed \
+clean-all: clean clean-gwfast clean-millilens clean-millilens-lensed \
 	clean-nonlensed-on-lensed clean-summarise
 
 force: clean
 	$(MAKE) bilby
-
-force-cogwheel: clean-cogwheel
-	$(MAKE) cogwheel
 
 force-gwfast: clean-gwfast
 	$(MAKE) gwfast
@@ -212,40 +197,35 @@ force-nonlensed-on-lensed: clean-nonlensed-on-lensed
 force-summarise: clean-summarise
 	$(MAKE) summarise
 
+force-all: clean-all
+	$(MAKE) all
+
 help:
 	@echo "Targets:"
-	@echo "  make / make bilby         Build bilby PE products (resume if interrupted)"
-	@echo "  make cogwheel             Build cogwheel PE products (resume if interrupted)"
-	@echo "  make gwfast               Build gwfast Fisher-matrix products"
+	@echo "  make / make all           Full pipeline (PE runs + summarise + gwfast)"
+	@echo "  make bilby                Tutorial-01 unlensed PE (resume if interrupted)"
+	@echo "  make gwfast               gwfast Fisher-matrix products"
 	@echo "  make millilens            Millilensing PE on unlensed 01 data"
 	@echo "  make millilens-lensed     Millilensing PE on a lensed two-image injection"
 	@echo "  make nonlensed-on-lensed  Tutorial-01 PE (unlensed model) on lensed data"
 	@echo "  make summarise            Evidences, Bayes factors, shared-parameter overlays"
-	@echo "  make clean                Remove bilby output"
-	@echo "  make clean-cogwheel       Remove cogwheel output"
+	@echo "  make clean                Remove bilby (01) output"
 	@echo "  make clean-gwfast         Remove gwfast output"
 	@echo "  make clean-millilens      Remove millilensing-on-unlensed output"
 	@echo "  make clean-millilens-lensed  Remove millilensing-on-lensed output"
 	@echo "  make clean-nonlensed-on-lensed  Remove nonlensed-on-lensed output"
 	@echo "  make clean-summarise      Remove summarise output"
 	@echo "  make clean-all            Remove all tutorial outputs"
-	@echo "  make force                Clean and rebuild bilby"
-	@echo "  make force-cogwheel       Clean and rebuild cogwheel"
-	@echo "  make force-gwfast         Clean and rebuild gwfast"
-	@echo "  make force-millilens      Clean and rebuild millilens"
-	@echo "  make force-millilens-lensed  Clean and rebuild millilens-lensed"
-	@echo "  make force-nonlensed-on-lensed  Clean and rebuild nonlensed-on-lensed"
-	@echo "  make force-summarise      Clean and rebuild summarise"
+	@echo "  make force / force-*      Clean and rebuild a target (force-all = everything)"
 	@echo ""
-	@echo "Bilby products:"
+	@echo "Environment (exported to recipes):"
+	@echo "  MPLBACKEND=$(MPLBACKEND)   matplotlib backend (default Agg for headless)"
+	@echo "  NPOOL=$(NPOOL)             dynesty worker processes per bilby run"
+	@echo ""
+	@echo "Bilby (01) products:"
 	@echo "  $(BILBY_WAVEFORMS)"
 	@echo "  $(BILBY_CORNER)"
 	@echo "  $(BILBY_RESULT)"
-	@echo ""
-	@echo "Cogwheel products:"
-	@echo "  $(COGWHEEL_WAVEFORMS)"
-	@echo "  $(COGWHEEL_CORNER)"
-	@echo "  $(COGWHEEL_RESULT)"
 	@echo ""
 	@echo "gwfast products:"
 	@echo "  $(GWFAST_WAVEFORMS)"
