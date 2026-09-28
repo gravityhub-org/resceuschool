@@ -17,8 +17,8 @@ all: $(PDFS)
 $(LAPLACE_GIF) figures/laplace_approximation.pdf: $(LAPLACE_SCRIPT)
 	$(PYTHON) $(LAPLACE_SCRIPT)
 
-# Okular-playable dual animation page (LaTeX animate widgets)
-$(ANIM_PDF): $(ANIM_SCRIPT) $(LAPLACE_GIF) figures/external/nested_sampling.gif
+# Okular-playable full-slide animation pages (nested + Laplace)
+$(ANIM_PDF): $(ANIM_SCRIPT) $(LAPLACE_GIF) figures/external/nested_sampling.gif lecture1.typ
 	$(PYTHON) $(ANIM_SCRIPT) animate
 
 # lecture1: Typst placeholder, then splice Okular animate page over the GIF slide

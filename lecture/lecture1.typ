@@ -30,19 +30,18 @@
   - Evidence $Z$: overall probability of the data under the model.
 ]
 
-// Nested sampling + Laplace GIFs (figures only). Typst freezes GIF frames;
-// `make lecture1.pdf` splices an Okular-playable LaTeX-animate page over this.
+// Nested sampling GIF (full-slide). Typst freezes GIF frames;
+// `make lecture1.pdf` splices an Okular-playable animate page over this.
 #figure-slide(
   [How to get from a detector to merging black hole?],
   image("figures/external/nested_sampling.gif", width: 100%, height: 100%, fit: "contain"),
   credit: [Credit: David Yallup],
 )
-// Nested sampling + Laplace GIFs (figures only). Typst freezes GIF frames;
-// `make lecture1.pdf` splices an Okular-playable LaTeX-animate page over this.
+
+// Laplace GIF (full-slide). Same Okular splice as the previous page.
 #figure-slide(
   [How to get from a detector to merging black hole?],
   image("figures/laplace_approximation.gif", width: 100%, height: 100%, fit: "contain"),
-  credit: [],
 )
 
 // Lens set up: Geometry 
